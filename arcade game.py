@@ -4,6 +4,8 @@ import random
 #constants
 WIDTH = 300
 HEIGHT = 600
+time = 60
+
 
 #window building
 root = tk.Tk()
@@ -68,13 +70,43 @@ def make_car_sprite():
                 img.put("grey", (x,y))
     return img
 
-#makeing the player spawn
-player_img = make_frog_sprite
+#start function
+player_img = make_frog_sprite()
+def start():
+    global player
+    player = canvas.create_image(WIDTH//2, HEIGHT-40, image=player_img, anchor="center")
+    game_loop()
 
 
+#timer
+def countdown(time):
+    label.config(text=f"Timer: {time}")
+    if time > 0:
+        root.after(1000, countdown, time -1)
+    else:
+        label.config(text="Times Up!")
+
+#bindings / player spawning
+def move_left(event):
+    canvas.move(player, -15,0)
+def move_right(event):
+    canvas.move(player, 0, 15)
+root.bind("<Left>", move_left)
+root.bind("<Right>", move_right)
 
 
+#game loop
+
+alive = True
+
+def game_loop():
+    global alive
+
+    if not alive:
+        canvas.delete("all")
+        canvas.create_text(WIDTH//2, HEIGHT//2, text="GAME OVER", fill="red", font=("Arial",24))
+        return 
 
 
-
+root.after(0, countdown, 60)
 root.mainloop()
