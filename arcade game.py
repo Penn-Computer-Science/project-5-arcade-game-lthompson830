@@ -2,10 +2,9 @@ import tkinter as tk
 import random
 
 #constants
-WIDTH = 300
-HEIGHT = 600
-time = 60
-
+WIDTH = 600
+HEIGHT = 300
+count = 60
 
 #window building
 root = tk.Tk()
@@ -41,7 +40,7 @@ def make_frog_sprite():
             if pattern[y][x] == "4":
                 img.put("white", (x,y))
     return img
-
+cars= []
 #car creation
 def make_car_sprite():
     pattern = [
@@ -57,7 +56,6 @@ def make_car_sprite():
     ]
     h = len(pattern)
     w = len(pattern[0])
-
     img = tk.PhotoImage(width=w, height=h)
     
     for y in range(h):
@@ -70,43 +68,70 @@ def make_car_sprite():
                 img.put("grey", (x,y))
     return img
 
-#start function
-player_img = make_frog_sprite()
-def start():
-    global player
-    player = canvas.create_image(WIDTH//2, HEIGHT-40, image=player_img, anchor="center")
-    game_loop()
+frog_img = make_frog_sprite()
+car_img = make_car_sprite()
 
-
-#timer
-def countdown(time):
-    label.config(text=f"Timer: {time}")
-    if time > 0:
-        root.after(1000, countdown, time -1)
-    else:
-        label.config(text="Times Up!")
-
-#bindings / player spawning
+def make_cars():
+    cars.clear()
+    start_x =0
+    start_y = random.randint(10, 200)
+    car = canvas.create_image(start_x, start_y, image=car_img, anchor="s" )
+    cars.append(car)
+    
+def move_cars():
+    for car in cars:
+        canvas.move(car, 10, 0)
+   
 def move_left(event):
-    canvas.move(player, -15,0)
+    canvas.move(frog, -15, 0)
+
 def move_right(event):
-    canvas.move(player, 0, 15)
+    canvas.move(frog, 15, 0)
+def move_up(event):
+    canvas.move(frog, 0, -15)
+
+def move_down(event):
+    canvas.move(frog, 0, 15)
+
 root.bind("<Left>", move_left)
 root.bind("<Right>", move_right)
+root.bind("<Up>", move_up)
+root.bind("<Down>", move_down)
 
+def countdown(count):
+    label.config(text=count)
 
-#game loop
+    if count > 0:
+        root.after(1000, countdown, count - 1)
+    else:
+        not alive
+        label.config(text="TIME'S UP")
 
 alive = True
 
+def start():
+    global frog
+    frog =  canvas.create_image(300, HEIGHT, image=frog_img, anchor="c")
+    game_loop()
+    
 def game_loop():
     global alive
-
     if not alive:
         canvas.delete("all")
-        canvas.create_text(WIDTH//2, HEIGHT//2, text="GAME OVER", fill="red", font=("Arial",24))
-        return 
+        canvas.create_text(WIDTH//2, HEIGHT//2, text = "GAME OVER", fill = "red")
+        return
+    if count == 0:
+        not alive
 
+    if random.randint(0, 20) ==1:
+        make_cars()
+    move_cars()
 
-root.after(0, countdown, 60)
+    
+    
+    root.after(40, game_loop)
+
+    
+root.after(0, countdown, count)
+start()
 root.mainloop()
