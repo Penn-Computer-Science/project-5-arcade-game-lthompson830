@@ -124,7 +124,8 @@ def game_loop():
         return
     elif count <= 0:
         alive = False
-    
+    if fx1 < -1 or fx2 > 601:
+        alive = False
     if random.randint(0, 1) ==1:
         make_cars()
     move_cars()
