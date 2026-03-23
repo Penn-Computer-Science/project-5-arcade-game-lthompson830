@@ -4,13 +4,13 @@ import random
 #constants
 WIDTH = 600
 HEIGHT = 300
-count = 20
+count = 30
 
 #window building
 root = tk.Tk()
-root.title("Survive")
+root.title("Frogger")
 
-label = tk.Label(root, text = "TIME = 20")
+label = tk.Label(root, text = "TIME = 60")
 label.pack()
 canvas = tk.Canvas(root, width=WIDTH, height=HEIGHT, bg='black')
 canvas.pack()
@@ -40,8 +40,8 @@ def make_frog_sprite():
             if pattern[y][x] == "4":
                 img.put("white", (x,y))
     return img
-#car creation
 cars= []
+#car creation
 def make_car_sprite():
     pattern = [
         "04440004440",
@@ -72,21 +72,21 @@ frog_img = make_frog_sprite()
 car_img = make_car_sprite()
 
 def make_cars():
-    cars.clear()
     start_x =0
-    start_y =50 #random.randint(10, 200)
+    start_y = random.randint(10, 200)
     car = canvas.create_image(start_x, start_y, image=car_img, anchor="s" )
     cars.append(car)
     
+def move_cars():
+    for car in cars:
+        canvas.move(car, 10, 0)
    
 def move_left(event):
     canvas.move(frog, -15, 0)
-
 def move_right(event):
     canvas.move(frog, 15, 0)
 def move_up(event):
     canvas.move(frog, 0, -15)
-
 def move_down(event):
     canvas.move(frog, 0, 15)
 
@@ -101,43 +101,48 @@ def countdown(count):
     if count > 0:
         root.after(1000, countdown, count - 1)
     else:
-        label.config(text="Times Up")
+        alive = False
+        label.config(text="TIME'S UP")
         canvas.delete("all")
-        canvas.create_text(WIDTH//2, HEIGHT//2, text = "You Win!", fill = "green")
-        return
-
+        
+        canvas.create_text(WIDTH//2, HEIGHT//2, text = "GAME OVER", fill = "red")
 
 alive = True
 
 def start():
-    global frog
-    frog =  canvas.create_image(300, 150, image=frog_img, anchor="c")
+    global frog, cars
+    cars.clear()
+    frog =  canvas.create_image(300, HEIGHT, image=frog_img, anchor="c")
     game_loop()
     
 def game_loop():
     global alive
     if not alive:
         canvas.delete("all")
+        
         canvas.create_text(WIDTH//2, HEIGHT//2, text = "GAME OVER", fill = "red")
-        count == 0
-        label.config(text="You Lose.")
         return
+    elif count <= 0:
+        alive = False
+    
+    if random.randint(0, 1) ==1:
+        make_cars()
+    move_cars()
 
-    for e in cars:
-        cx1, cy1, cx2, cy2 = canvas.bbox(cars)
+    for car in cars[:]:
+        cx1, cy1, cx2, cy2 = canvas.bbox(car)
         fx1, fy1, fx2, fy2 = canvas.bbox(frog)
 
-        if cx1 < fx2 and cx2 > fx1 and cy1 < fy2 and cy2 > fy1:
-                alive = False
+        if (cx1 < fx2 and cx2 > fx1 and cy1 < fy2 and cy2 > fy1):
+            alive = False
+        if cx1 > WIDTH:
+            canvas.delete(car)
+            cars.remove(car)
+        
+        if fy1 <= 0:
+            canvas.delete("all")
+            canvas.create_text(WIDTH//2, HEIGHT//2, text = "YOU WIN", fill = "Blue")
 
-    if random.randint(0, 20) ==1:
-        make_cars()
-    
-    for car in cars:
-        canvas.move(cars, 10, 0)
-
-    
-    
     root.after(40, game_loop)
 
     
